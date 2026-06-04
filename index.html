@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Pet Keeper — Coming Soon</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern CSS Reset & Design Variables */
+        :root {
+            --font-main: 'Montserrat', sans-serif;
+            --color-bg: #f2f2f4;
+            --color-text-dark: #1a1a1a;
+            --color-text-muted: #707072;
+            --color-accent: #000000;
+            --border-light: #d1d1d6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--color-bg);
+            color: var(--color-text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        /* ---------------------------------- */
+        /* Mist-Blended Dog Background        */
+        /* ---------------------------------- */
+        .bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background-color: var(--color-bg);
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 35%;
+            filter: grayscale(80%) brightness(1.2) contrast(0.85);
+            opacity: 0.18; /* High transparency blends the dark GSD into the misty background */
+            transition: transform 12s ease;
+        }
+
+        /* Ambient Fog Layer */
+        .bg-fog {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(242,242,244,0.3) 0%, rgba(242,242,244,0.92) 85%);
+        }
+
+        /* ---------------------------------- */
+        /* Header & Navigation                */
+        /* ---------------------------------- */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3rem 4rem;
+            z-index: 10;
+        }
+
+        /* Styled Minimal Corner Brackets */
+        .bracket-box {
+            position: relative;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.25em;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        .bracket-box::before,
+        .bracket-box::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 100%;
+            border-color: var(--border-light);
+            border-style: solid;
+            top: 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .bracket-box::before {
+            left: 0;
+            border-width: 1px 0 1px 1px;
+        }
+
+        .bracket-box::after {
+            right: 0;
+            border-width: 1px 1px 1px 0;
+        }
+
+        .nav-links a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-text-dark);
+        }
+
+        .nav-divider {
+            margin: 0 0.5rem;
+            color: var(--border-light);
+            font-weight: 300;
+        }
+
+        /* Brand Logo */
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--color-text-dark);
+            text-indent: 0.4em; /* Offsets letter-spacing centering */
+        }
+
+        /* ---------------------------------- */
+        /* Main Hero Content                  */
+        /* ---------------------------------- */
+        main {
+            text-align: center;
+            padding: 0 2rem;
+            max-width: 800px;
+            z-index: 5;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 0.45em;
+            color: var(--color-text-dark);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            text-indent: 0.45em;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            line-height: 2;
+            letter-spacing: 0.08em;
+            color: var(--color-text-muted);
+            max-width: 520px;
+            margin: 0 auto 3rem auto;
+            font-weight: 400;
+        }
+
+        /* Interactive Morphing Form Container */
+        .notify-container {
+            position: relative;
+            width: 180px;
+            height: 46px;
+            margin: 0 auto;
+            transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .notify-container.active {
+            width: 320px;
+        }
+
+        .notify-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-text-dark);
+            color: #ffffff;
+            border: none;
+            font-family: var(--font-main);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s;
+            z-index: 2;
+        }
+
+        .notify-btn:hover {
+            background-color: #333335;
+        }
+
+        .notify-container.active .notify-btn {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        /* Hidden Input Box (Smooth Slide-In) */
+        .subscription-form {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            opacity: 0;
+            transform: scale(0.96);
+            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .notify-container.active .subscription-form {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .subscription-form input {
+            flex-grow: 1;
+            border: 1px solid var(--color-text-dark);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            padding: 0 1rem;
+            font-family: var(--font-main);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            outline: none;
+        }
+
+        .subscription-form button {
+            background-color: var(--color-text-dark);
+            color: #ffffff;
+            border: none;
+            padding: 0 1.2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .subscription-form button:hover {
+            background-color: #333;
+        }
+
+        /* ---------------------------------- */
+        /* Slide-Down Content Panels         */
+        /* ---------------------------------- */
+        .slide-panel {
+            position: fixed;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 45vh;
+            background-color: rgba(242, 242, 244, 0.98);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 100;
+            transition: top 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+        }
+
+        .slide-panel.open {
+            top: 0;
+        }
+
+        .panel-content {
+            max-width: 600px;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .panel-content h2 {
+            font-size: 1rem;
+            letter-spacing: 0.3em;
+            margin-bottom: 1.2rem;
+            color: var(--color-text-dark);
+            text-transform: uppercase;
+        }
+
+        .panel-content p {
+            font-size: 0.8rem;
+            line-height: 1.8;
+            color: var(--color-text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .panel-content .contact-email {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--color-text-dark);
+        }
+
+        .close-btn {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 4rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-weight: 300;
+        }
+
+        .close-btn:hover {
+            color: var(--color-text-dark);
+        }
+
+        /* ---------------------------------- */
+        /* Footer                             */
+        /* ---------------------------------- */
+        footer {
+            width: 100%;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            z-index: 10;
+        }
+
+        .copyright {
+            font-size: 0.62rem;
+            letter-spacing: 0.15em;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+        }
+
+        .socials {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .socials a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            transition: color 0.2s ease;
+        }
+
+        .socials a:hover {
+            color: var(--color-text-dark);
+        }
+
+        /* ---------------------------------- */
+        /* Responsive Adaptations             */
+        /* ---------------------------------- */
+        @media (max-width: 768px) {
+            header {
+                padding: 2rem;
+                flex-direction: column;
+                gap: 2rem;
+            }
+            .bracket-box {
+                order: 2;
+                width: 100%;
+                text-align: center;
+            }
+            .brand-logo {
+                order: 1;
+            }
+            main {
+                padding-top: 4rem;
+            }
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 0.3em;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 2rem;
+            }
+            .close-btn {
+                right: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Misty Dog Background -->
+    <div class="bg-container">
+        <img class="bg-image" id="bgImage" src="https://images.unsplash.com/photo-1555557135-0971899f7e3c?auto=format&fit=crop&w=1920&q=80" alt="Black German Shepherd portrait">
+        <div class="bg-fog"></div>
+    </div>
+
+    <!-- Top Navigation & Branding Bar -->
+    <header>
+        <div class="bracket-box nav-links">
+            <a href="#" onclick="openPanel('aboutPanel')">ABOUT</a>
+            <span class="nav-divider">|</span>
+            <a href="#" onclick="openPanel('contactPanel')">CONTACT</a>
+        </div>
+
+        <div class="brand-logo">
+            <!-- Minimal Geometric Triangle / Paw-like Logo -->
+            <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 12 L88 78 L12 78 Z" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M50 32 L70 68 L30 68 Z" fill="#1a1a1a"/>
+            </svg>
+            <div class="logo-text">The Pet Keeper</div>
+        </div>
+
+        <!-- Dynamic Live Countdown -->
+        <div class="bracket-box" id="countdownBox">
+            <span id="days-left">-- DAYS LEFT</span>
+        </div>
+    </header>
+
+    <!-- Slide-Down Utility Panels -->
+    <div class="slide-panel" id="aboutPanel">
+        <button class="close-btn" onclick="closePanel('aboutPanel')">&#10005;</button>
+        <div class="panel-content">
+            <h2>About the keeper</h2>
+            <p>The Pet Keeper is an upcoming platform offering specialized training methodologies, lifestyle curation, and expert behavior guides tailored for working breeds. We prioritize precision, focus, and modern positive training habits.</p>
+        </div>
+    </div>
+
+    <div class="slide-panel" id="contactPanel">
+        <button class="close-btn" onclick="closePanel('contactPanel')">&#10005;</button>
+        <div class="panel-content">
+            <h2>Get in touch</h2>
+            <p>Interested in early beta access, partnerships, or professional advice? Drop us an inquiry at:</p>
+            <p class="contact-email">hello@thepetkeeper.com</p>
+        </div>
+    </div>
+
+    <!-- Center Hero Callout -->
+    <main>
+        <h1>Coming Soon</h1>
+        <p class="subtitle">We are currently training our new digital platform to fetch you the best experience. We will launch soon, subscribe to remain updated.</p>
+
+        <!-- Interactive Morphing Signup Container -->
+        <div class="notify-container" id="notifyContainer">
+            <!-- <button class="notify-btn" id="notifyBtn" onclick="activateForm()">NOTIFY ME</button> -->
+            <form class="subscription-form" id="subscriptionForm">
+                <input type="email" placeholder="ENTER YOUR EMAIL" required id="emailInput">
+                <button type="submit">&#8594;</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer Area -->
+    <footer>
+        <div class="copyright">
+            Website by The Pet Keeper &copy; <span id="year"></span>. All Rights Reserved.
+        </div>
+        <div class="socials">
+            <a href="#">FB</a>
+            <a href="#">TW</a>
+            <a href="#">LN</a>
+            <a href="#">BE</a>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Dynamic Countdown Timer (Calculates days dynamically)
+        // Adjust the date below to set your exact target date
+        const targetLaunchDate = new Date();
+        targetLaunchDate.setDate(targetLaunchDate.getDate() + 36); // 35 Days from today
+
+        function calculateCountdown() {
+            const now = new Date();
+            const difference = targetLaunchDate - now;
+            const daysRemaining = Math.max(0, Math.ceil(difference / (1000 * 60 * 60 * 24)));
+            document.getElementById('days-left').textContent = `${daysRemaining} DAYS LEFT`;
+        }
+        calculateCountdown();
+
+        // 2. Dynamic Copyright Year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 3. Morphing Form Activation
+        function activateForm() {
+            document.getElementById('notifyContainer').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('emailInput').focus();
+            }, 300);
+        }
+
+        // Close form on clicking outside the container
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('notifyContainer');
+            const button = document.getElementById('notifyBtn');
+            if (!container.contains(event.target) && event.target !== button) {
+                container.classList.remove('active');
+            }
+        });
+
+        // Form submission feedback
+        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            if(email) {
+                alert(`Thank you! ${email} has been added to our launching alert list.`);
+                document.getElementById('notifyContainer').classList.remove('active');
+                document.getElementById('emailInput').value = '';
+            }
+        });
+
+        // 4. Panel Slider Controls
+        function openPanel(panelId) {
+            // Close any open panels first
+            document.querySelectorAll('.slide-panel').forEach(panel => {
+                panel.classList.remove('open');
+            });
+            document.getElementById(panelId).classList.add('open');
+        }
+
+        function closePanel(panelId) {
+            document.getElementById(panelId).classList.remove('open');
+        }
+
+        // Subtle parallax effect on load
+        window.addEventListener('load', () => {
+            document.getElementById('bgImage').style.transform = 'scale(1.03)';
+        });
+    </script>
+</body>
+</html>
