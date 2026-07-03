@@ -1,555 +1,956 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Pet Keeper — Coming Soon</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <style>
-        /* Modern CSS Reset & Design Variables */
-        :root {
-            --font-main: 'Montserrat', sans-serif;
-            --color-bg: #f2f2f4;
-            --color-text-dark: #1a1a1a;
-            --color-text-muted: #707072;
-            --color-accent: #000000;
-            --border-light: #d1d1d6;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pet Keeper</title>
+<link rel="icon" type="image/png" href="petkeeper-icon.png">
+<link rel="apple-touch-icon" href="petkeeper-icon.png">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        body {
-            font-family: var(--font-main);
-            background-color: var(--color-bg);
-            color: var(--color-text-dark);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-        }
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream:    "#FBF7EF",
+          coat:     "#3E2B22",
+          fur:      "#C98A54",
+          rust:     "#B5502E",
+          charcoal: "#2A2420",
+        },
+        fontFamily: {
+          display: ["'Baloo 2'", "sans-serif"],
+          body: ["'Inter'", "sans-serif"],
+        },
+        borderRadius: {
+          card: "1.5rem",
+        },
+      },
+    },
+  };
+</script>
 
-        /* ---------------------------------- */
-        /* Mist-Blended Dog Background        */
-        /* ---------------------------------- */
-        .bg-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            background-color: var(--color-bg);
-        }
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-        .bg-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: 50% 35%;
-            filter: grayscale(80%) brightness(1.2) contrast(0.85);
-            opacity: 0.18; /* High transparency blends the dark GSD into the misty background */
-            transition: transform 12s ease;
-        }
+<style>
+  html { scroll-behavior: smooth; }
+  body { background-color: #FBF7EF; }
 
-        /* Ambient Fog Layer */
-        .bg-fog {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(242,242,244,0.3) 0%, rgba(242,242,244,0.92) 85%);
-        }
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal-visible { opacity: 1; transform: translateY(0); }
 
-        /* ---------------------------------- */
-        /* Header & Navigation                */
-        /* ---------------------------------- */
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 3rem 4rem;
-            z-index: 10;
-        }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  .float-slow { animation: floatY 6s ease-in-out infinite; }
 
-        /* Styled Minimal Corner Brackets */
-        .bracket-box {
-            position: relative;
-            padding: 0.6rem 1.8rem;
-            font-size: 0.72rem;
-            letter-spacing: 0.25em;
-            color: var(--color-text-muted);
-            font-weight: 500;
-        }
+  @keyframes testimonialFade {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .testimonial-fade { animation: testimonialFade 0.5s ease; }
 
-        .bracket-box::before,
-        .bracket-box::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            height: 100%;
-            border-color: var(--border-light);
-            border-style: solid;
-            top: 0;
-            transition: border-color 0.3s ease;
-        }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .float-slow, .testimonial-fade {
+      animation: none !important;
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
 
-        .bracket-box::before {
-            left: 0;
-            border-width: 1px 0 1px 1px;
-        }
+  .mobile-nav { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+  .mobile-nav.open { max-height: 20rem; }
 
-        .bracket-box::after {
-            right: 0;
-            border-width: 1px 1px 1px 0;
-        }
-
-        .nav-links a {
-            color: var(--color-text-muted);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--color-text-dark);
-        }
-
-        .nav-divider {
-            margin: 0 0.5rem;
-            color: var(--border-light);
-            font-weight: 300;
-        }
-
-        /* Brand Logo */
-        .brand-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            margin-bottom: 0.5rem;
-        }
-
-        .logo-text {
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--color-text-dark);
-            text-indent: 0.4em; /* Offsets letter-spacing centering */
-        }
-
-        /* ---------------------------------- */
-        /* Main Hero Content                  */
-        /* ---------------------------------- */
-        main {
-            text-align: center;
-            padding: 0 2rem;
-            max-width: 800px;
-            z-index: 5;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 0.45em;
-            color: var(--color-text-dark);
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
-            text-indent: 0.45em;
-        }
-
-        .subtitle {
-            font-size: 0.85rem;
-            line-height: 2;
-            letter-spacing: 0.08em;
-            color: var(--color-text-muted);
-            max-width: 520px;
-            margin: 0 auto 3rem auto;
-            font-weight: 400;
-        }
-
-        /* Interactive Morphing Form Container */
-        .notify-container {
-            position: relative;
-            width: 180px;
-            height: 46px;
-            margin: 0 auto;
-            transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .notify-container.active {
-            width: 320px;
-        }
-
-        .notify-btn {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--color-text-dark);
-            color: #ffffff;
-            border: none;
-            font-family: var(--font-main);
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.25em;
-            cursor: pointer;
-            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s;
-            z-index: 2;
-        }
-
-        .notify-btn:hover {
-            background-color: #333335;
-        }
-
-        .notify-container.active .notify-btn {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
-        }
-
-        /* Hidden Input Box (Smooth Slide-In) */
-        .subscription-form {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            opacity: 0;
-            transform: scale(0.96);
-            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .notify-container.active .subscription-form {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-
-        .subscription-form input {
-            flex-grow: 1;
-            border: 1px solid var(--color-text-dark);
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(5px);
-            padding: 0 1rem;
-            font-family: var(--font-main);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            outline: none;
-        }
-
-        .subscription-form button {
-            background-color: var(--color-text-dark);
-            color: #ffffff;
-            border: none;
-            padding: 0 1.2rem;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        .subscription-form button:hover {
-            background-color: #333;
-        }
-
-        /* ---------------------------------- */
-        /* Slide-Down Content Panels         */
-        /* ---------------------------------- */
-        .slide-panel {
-            position: fixed;
-            top: -100%;
-            left: 0;
-            width: 100%;
-            height: 45vh;
-            background-color: rgba(242, 242, 244, 0.98);
-            border-bottom: 1px solid var(--border-light);
-            z-index: 100;
-            transition: top 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(15px);
-        }
-
-        .slide-panel.open {
-            top: 0;
-        }
-
-        .panel-content {
-            max-width: 600px;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .panel-content h2 {
-            font-size: 1rem;
-            letter-spacing: 0.3em;
-            margin-bottom: 1.2rem;
-            color: var(--color-text-dark);
-            text-transform: uppercase;
-        }
-
-        .panel-content p {
-            font-size: 0.8rem;
-            line-height: 1.8;
-            color: var(--color-text-muted);
-            letter-spacing: 0.05em;
-        }
-
-        .panel-content .contact-email {
-            margin-top: 1rem;
-            font-weight: 600;
-            color: var(--color-text-dark);
-        }
-
-        .close-btn {
-            position: absolute;
-            bottom: 1.5rem;
-            right: 4rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--color-text-muted);
-            cursor: pointer;
-            font-weight: 300;
-        }
-
-        .close-btn:hover {
-            color: var(--color-text-dark);
-        }
-
-        /* ---------------------------------- */
-        /* Footer                             */
-        /* ---------------------------------- */
-        footer {
-            width: 100%;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.2rem;
-            z-index: 10;
-        }
-
-        .copyright {
-            font-size: 0.62rem;
-            letter-spacing: 0.15em;
-            color: var(--color-text-muted);
-            text-transform: uppercase;
-        }
-
-        .socials {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .socials a {
-            color: var(--color-text-muted);
-            text-decoration: none;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            transition: color 0.2s ease;
-        }
-
-        .socials a:hover {
-            color: var(--color-text-dark);
-        }
-
-        /* ---------------------------------- */
-        /* Responsive Adaptations             */
-        /* ---------------------------------- */
-        @media (max-width: 768px) {
-            header {
-                padding: 2rem;
-                flex-direction: column;
-                gap: 2rem;
-            }
-            .bracket-box {
-                order: 2;
-                width: 100%;
-                text-align: center;
-            }
-            .brand-logo {
-                order: 1;
-            }
-            main {
-                padding-top: 4rem;
-            }
-            h1 {
-                font-size: 2rem;
-                letter-spacing: 0.3em;
-            }
-            .subtitle {
-                font-size: 0.8rem;
-                margin-bottom: 2rem;
-            }
-            .close-btn {
-                right: 2rem;
-            }
-        }
-    </style>
+  #pawTrail { position: absolute; top: 0; left: 2rem; width: 2.5rem; pointer-events: none; }
+  .paw {
+    position: absolute;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, color 0.5s ease-out;
+    color: rgba(62,43,34,0.35);
+    opacity: 0.12;
+    transform: scale(0.7);
+  }
+  .paw.walked { color: rgba(181,80,46,0.7); opacity: 0.85; transform: scale(1); }
+  .paw.landing { color: #C98A54; opacity: 1; transform: scale(1.3); }
+</style>
 </head>
-<body>
 
-    <!-- Ambient Misty Dog Background -->
-    <div class="bg-container">
-        <img class="bg-image" id="bgImage" src="https://images.unsplash.com/photo-1555557135-0971899f7e3c?auto=format&fit=crop&w=1920&q=80" alt="Black German Shepherd portrait">
-        <div class="bg-fog"></div>
+<body class="font-body text-charcoal">
+
+  <!-- ===================== HEADER ===================== -->
+  <header id="siteHeader" class="sticky top-0 z-50 bg-cream/90 backdrop-blur border-b border-transparent transition-shadow">
+    <div class="flex items-center justify-between px-6 md:px-10 py-3 max-w-6xl mx-auto">
+      <a href="#top" class="flex items-center gap-2.5 shrink-0">
+        <span class="w-10 h-10 rounded-full bg-fur flex items-center justify-center p-1.5 shadow-sm shrink-0">
+          <img src="petkeeper-icon.png" alt="" class="w-full h-full object-contain" />
+        </span>
+        <span class="font-display font-bold text-lg text-coat tracking-tight">The Pet Keeper</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-coat/80">
+        <a href="#services" class="hover:text-rust transition">Services</a>
+        <a href="#how-it-works" class="hover:text-rust transition">How it works</a>
+      </nav>
+
+      <div class="hidden md:flex items-center">
+        <a href="#notify" class="bg-fur text-white px-5 py-2.5 rounded-full hover:bg-rust transition shadow-sm hover:shadow-md text-sm font-semibold">
+          Get notified
+        </a>
+      </div>
+
+      <button type="button" id="menuToggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full text-coat hover:bg-coat/5 transition" aria-label="Open menu" aria-expanded="false">
+        <i data-lucide="menu" id="menuIconOpen" class="w-5 h-5"></i>
+        <i data-lucide="x" id="menuIconClose" class="w-5 h-5 hidden"></i>
+      </button>
     </div>
 
-    <!-- Top Navigation & Branding Bar -->
-    <header>
-        <div class="bracket-box nav-links">
-            <a href="#" onclick="openPanel('aboutPanel')">ABOUT</a>
-            <span class="nav-divider">|</span>
-            <a href="#" onclick="openPanel('contactPanel')">CONTACT</a>
+    <div id="mobileNav" class="mobile-nav md:hidden">
+      <div class="px-6 pb-5 pt-1 flex flex-col gap-1 border-t border-coat/10 bg-cream">
+        <a href="#services" class="py-2.5 text-sm font-semibold text-coat/80 hover:text-rust transition">Services</a>
+        <a href="#how-it-works" class="py-2.5 text-sm font-semibold text-coat/80 hover:text-rust transition">How it works</a>
+        <a href="#notify" class="mt-3 text-center bg-fur text-white font-semibold py-2.5 rounded-full hover:bg-rust transition">
+          Get notified
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="relative">
+    <div id="pawTrail" class="hidden xl:block" aria-hidden="true"></div>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="px-6 md:px-10 pt-14 pb-14 md:pt-20 md:pb-16 max-w-6xl mx-auto">
+      <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-14 items-center">
+        <div class="reveal">
+          <span class="inline-flex items-center gap-1.5 bg-fur/15 text-rust font-semibold text-xs px-4 py-1.5 rounded-full mb-6">
+            🐾 Dog care & wellness, Patna
+          </span>
+          <h1 class="font-display font-bold text-4xl md:text-6xl leading-[1.05] tracking-tight text-coat mb-6">
+            Every walk, every wag,<br />all in one place.
+          </h1>
+          <p class="text-charcoal/70 text-base md:text-lg mb-9 max-w-lg leading-relaxed">
+            Training, grooming, boarding, vaccinations and daily walks booked, tracked and photographed, so you always know how your dog's day went.
+          </p>
+          <div class="flex items-center gap-3 flex-wrap mb-11">
+            <a href="#notify" class="inline-flex items-center gap-2 bg-fur text-white font-semibold px-6 py-3.5 rounded-full hover:bg-rust transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5">
+              Get notified at launch
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#how-it-works" class="border border-coat/20 text-coat font-semibold px-6 py-3.5 rounded-full hover:bg-coat/5 hover:-translate-y-0.5 transition-all duration-300">
+              See how it works
+            </a>
+          </div>
+
+          <div class="grid grid-cols-2 gap-x-5 gap-y-3 max-w-md">
+            <div class="flex items-center gap-2 text-sm text-charcoal/70">
+              <i data-lucide="shield-check" class="w-4 h-4 text-fur shrink-0"></i>
+              <span>Verified caregivers only</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-charcoal/70">
+              <i data-lucide="radio" class="w-4 h-4 text-fur shrink-0"></i>
+              <span>Live updates while you're away</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-charcoal/70">
+              <i data-lucide="file-text" class="w-4 h-4 text-fur shrink-0"></i>
+              <span>Transparent pricing, no surprises</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-charcoal/70">
+              <i data-lucide="map-pin" class="w-4 h-4 text-fur shrink-0"></i>
+              <span>Built for Patna, by locals</span>
+            </div>
+          </div>
         </div>
 
-        <div class="brand-logo">
-            <!-- Minimal Geometric Triangle / Paw-like Logo -->
-            <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 12 L88 78 L12 78 Z" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round"/>
-                <path d="M50 32 L70 68 L30 68 Z" fill="#1a1a1a"/>
+        <div class="relative reveal" style="transition-delay:150ms">
+          <div class="absolute -inset-6 bg-gradient-to-br from-fur/20 to-rust/10 rounded-[2rem] blur-2xl -z-10 float-slow"></div>
+          <div class="bg-white rounded-card border border-coat/10 shadow-xl p-6 max-w-sm mx-auto hover:shadow-2xl transition-shadow duration-500 float-slow">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <p class="text-xs font-semibold text-charcoal/40 uppercase tracking-wide">Wellness Dashboard · preview</p>
+                <p class="font-display font-bold text-coat">Today's timeline</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 bg-rust/10 text-rust text-[11px] font-bold px-2.5 py-1 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-rust animate-pulse"></span>
+                LIVE
+              </span>
+            </div>
+
+            <div class="space-y-4" id="timelinePreview">
+              <div class="flex gap-3 group">
+                <div class="flex flex-col items-center">
+                  <span class="w-9 h-9 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-fur group-hover:text-white group-hover:scale-110">
+                    <i data-lucide="utensils-crossed" class="w-4 h-4"></i>
+                  </span>
+                  <span class="w-px flex-1 bg-coat/10 mt-1"></span>
+                </div>
+                <div class="pb-1">
+                  <p class="text-[11px] font-semibold text-charcoal/40">8:02 AM</p>
+                  <p class="text-sm font-bold text-coat leading-tight">Breakfast logged</p>
+                  <p class="text-xs text-charcoal/55">200g, on schedule</p>
+                </div>
+              </div>
+              <div class="flex gap-3 group">
+                <div class="flex flex-col items-center">
+                  <span class="w-9 h-9 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-fur group-hover:text-white group-hover:scale-110">
+                    <i data-lucide="footprints" class="w-4 h-4"></i>
+                  </span>
+                  <span class="w-px flex-1 bg-coat/10 mt-1"></span>
+                </div>
+                <div class="pb-1">
+                  <p class="text-[11px] font-semibold text-charcoal/40">9:15 AM</p>
+                  <p class="text-sm font-bold text-coat leading-tight">Morning walk</p>
+                  <p class="text-xs text-charcoal/55">2.1 km · 24 min</p>
+                </div>
+              </div>
+              <div class="flex gap-3 group">
+                <div class="flex flex-col items-center">
+                  <span class="w-9 h-9 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-fur group-hover:text-white group-hover:scale-110">
+                    <i data-lucide="sun" class="w-4 h-4"></i>
+                  </span>
+                  <span class="w-px flex-1 bg-coat/10 mt-1"></span>
+                </div>
+                <div class="pb-1">
+                  <p class="text-[11px] font-semibold text-charcoal/40">11:00 AM</p>
+                  <p class="text-sm font-bold text-coat leading-tight">Daycare check-in</p>
+                  <p class="text-xs text-charcoal/55">Playing with 3 dogs</p>
+                </div>
+              </div>
+              <div class="flex gap-3 group">
+                <div class="flex flex-col items-center">
+                  <span class="w-9 h-9 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-fur group-hover:text-white group-hover:scale-110">
+                    <i data-lucide="scissors" class="w-4 h-4"></i>
+                  </span>
+                </div>
+                <div class="pb-1">
+                  <p class="text-[11px] font-semibold text-charcoal/40">4:30 PM</p>
+                  <p class="text-sm font-bold text-coat leading-tight">Grooming complete</p>
+                  <p class="text-xs text-charcoal/55">Photos added</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-coat/10 flex items-center justify-between">
+              <p class="text-xs text-charcoal/50">4 of 4 updates today</p>
+              <div class="w-24 h-1.5 rounded-full bg-coat/10 overflow-hidden">
+                <div class="h-full w-full bg-fur rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TESTIMONIALS ===================== -->
+    <section id="testimonials" class="relative px-6 md:px-10 py-20 md:py-28 max-w-6xl mx-auto overflow-hidden">
+      <i data-lucide="paw-print" class="hidden md:block absolute top-8 left-2 text-fur/10 -rotate-12 w-16 h-16"></i>
+      <i data-lucide="paw-print" class="hidden md:block absolute bottom-10 right-4 text-rust/10 rotate-12 w-24 h-24"></i>
+      <i data-lucide="paw-print" class="hidden md:block absolute top-1/2 right-1/4 text-coat/10 rotate-45 w-10 h-10"></i>
+
+      <div class="reveal max-w-lg mb-12 relative">
+        <span class="text-xs font-bold text-rust uppercase tracking-wide">Pet parents say</span>
+        <h2 class="font-display font-bold text-3xl md:text-4xl text-coat mt-2 mb-3 tracking-tight">Trusted across Patna.</h2>
+        <p class="text-charcoal/60 text-base leading-relaxed">Real accounts from dog parents using The Pet Keeper day to day.</p>
+      </div>
+
+      <div class="relative max-w-2xl mx-auto reveal" style="transition-delay:100ms">
+        <div id="testimonialCard" class="testimonial-fade bg-white rounded-card border border-coat/10 p-8 md:p-10 shadow-lg relative">
+          <i data-lucide="quote" class="absolute top-6 right-7 text-fur/10 w-14 h-14"></i>
+
+          <div class="flex items-center gap-1 mb-5" id="testimonialStars"></div>
+
+          <p class="text-coat font-display text-lg md:text-xl leading-relaxed mb-8 relative z-10" id="testimonialQuote"></p>
+
+          <div class="flex items-center gap-3.5">
+            <div class="relative shrink-0">
+              <div id="testimonialAvatar" class="w-12 h-12 rounded-full bg-gradient-to-br from-fur to-rust flex items-center justify-center text-white font-display font-bold text-sm"></div>
+              <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-cream border border-white flex items-center justify-center">
+                <i data-lucide="paw-print" class="w-2.5 h-2.5 text-fur"></i>
+              </span>
+            </div>
+            <div>
+              <p class="font-display font-bold text-coat text-sm leading-tight" id="testimonialName"></p>
+              <p class="text-xs text-charcoal/55 flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-2.5 h-2.5 text-fur shrink-0"></i>
+                <span id="testimonialLocality"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div id="testimonialRail" class="flex items-center justify-center gap-3 mt-7"></div>
+      </div>
+    </section>
+
+    <!-- ===================== SERVICES ===================== -->
+    <section id="services" class="px-6 md:px-10 pb-20 md:pb-28 max-w-6xl mx-auto">
+      <div class="reveal max-w-lg mb-12">
+        <span class="text-xs font-bold text-rust uppercase tracking-wide">Services</span>
+        <h2 class="font-display font-bold text-3xl md:text-4xl text-coat mt-2 mb-3 tracking-tight">Fourteen services, one timeline.</h2>
+        <p class="text-charcoal/60 text-base leading-relaxed">Every category below books through the same flow and lands on the same wellness timeline per dog.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="reveal bg-white rounded-card border border-coat/10 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="mb-4">
+            <h3 class="font-display font-bold text-lg text-coat">Daily care</h3>
+            <p class="text-charcoal/55 text-sm">The everyday rhythm, handled and logged.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="utensils-crossed" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Feeding</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="footprints" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Walks</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="sun" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Daycare</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="activity" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Wellness Dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal bg-white rounded-card border border-coat/10 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" style="transition-delay:90ms">
+          <div class="mb-4">
+            <h3 class="font-display font-bold text-lg text-coat">Health & training</h3>
+            <p class="text-charcoal/55 text-sm">Professional attention, tracked over time.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="target" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Training</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Therapy</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="syringe" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Vaccination</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="scissors" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Grooming</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal bg-white rounded-card border border-coat/10 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" style="transition-delay:180ms">
+          <div class="mb-4">
+            <h3 class="font-display font-bold text-lg text-coat">Stay & celebrate</h3>
+            <p class="text-charcoal/55 text-sm">For time away, and days worth marking.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="bed-double" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Boarding</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="party-popper" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Parties</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="camera" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Photography</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal bg-white rounded-card border border-coat/10 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" style="transition-delay:270ms">
+          <div class="mb-4">
+            <h3 class="font-display font-bold text-lg text-coat">Travel & move</h3>
+            <p class="text-charcoal/55 text-sm">Paperwork and logistics, taken care of.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="car" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Pick-up / Drop-off</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="file-text" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Travel Docs</span>
+            </div>
+            <div class="group flex items-center gap-2.5 bg-cream/70 border border-coat/10 rounded-xl px-3 py-2.5 hover:bg-fur hover:border-fur transition-all duration-300">
+              <span class="w-7 h-7 rounded-full bg-fur/12 text-fur flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white group-hover:rotate-6"><i data-lucide="truck" class="w-3.5 h-3.5"></i></span>
+              <span class="text-xs font-bold text-coat leading-tight transition-colors duration-300 group-hover:text-white">Relocation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how-it-works" class="px-6 md:px-10 pb-20 md:pb-28 max-w-6xl mx-auto">
+      <div class="reveal max-w-lg mb-12">
+        <span class="text-xs font-bold text-rust uppercase tracking-wide">How it works</span>
+        <h2 class="font-display font-bold text-3xl md:text-4xl text-coat mt-2 tracking-tight">Three steps, start to recap.</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8 relative">
+        <div class="reveal group">
+          <span class="font-display font-bold text-5xl text-fur/20 leading-none transition-colors duration-300 group-hover:text-fur/40">01</span>
+          <h3 class="font-display font-bold text-lg text-coat mt-3 mb-2">Book a service</h3>
+          <p class="text-charcoal/60 text-sm leading-relaxed">Pick training, walks, grooming, or any of our 14 services in a few taps — no phone calls.</p>
+        </div>
+        <div class="reveal group" style="transition-delay:120ms">
+          <span class="font-display font-bold text-5xl text-fur/20 leading-none transition-colors duration-300 group-hover:text-fur/40">02</span>
+          <h3 class="font-display font-bold text-lg text-coat mt-3 mb-2">We care, you watch</h3>
+          <p class="text-charcoal/60 text-sm leading-relaxed">Your caregiver checks in with photos and status updates while it happens, not after.</p>
+        </div>
+        <div class="reveal group" style="transition-delay:240ms">
+          <span class="font-display font-bold text-5xl text-fur/20 leading-none transition-colors duration-300 group-hover:text-fur/40">03</span>
+          <h3 class="font-display font-bold text-lg text-coat mt-3 mb-2">Get the recap</h3>
+          <p class="text-charcoal/60 text-sm leading-relaxed">Every visit lands on your dog's wellness timeline, so nothing about their day is a mystery.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== NOTIFY / FINAL CTA ===================== -->
+    <section id="notify" class="px-6 md:px-10 pb-20 md:pb-28 max-w-6xl mx-auto">
+      <div class="reveal">
+        <div class="rounded-[2rem] bg-gradient-to-br from-fur to-rust px-8 py-14 md:py-16 text-center shadow-xl hover:shadow-2xl transition-shadow duration-500">
+          <h3 class="font-display font-bold text-2xl md:text-3xl text-white mb-3 tracking-tight">Be the first to know.</h3>
+          <p class="text-white/85 text-sm md:text-base mb-8 max-w-md mx-auto">
+            We're putting the finishing touches on The Pet Keeper. Leave your email and we'll let you know the moment we launch in Patna.
+          </p>
+
+          <form id="notifyForm" class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto" novalidate>
+            <input
+              type="email"
+              id="notifyEmail"
+              required
+              placeholder="you@example.com"
+              class="w-full sm:w-auto flex-1 px-5 py-3.5 rounded-full border-0 text-sm text-coat placeholder:text-coat/40 focus:outline-none focus:ring-2 focus:ring-white"
+            />
+            <!-- Honeypot: hidden from real visitors via CSS, invisible to
+                 screen readers via aria-hidden/tabindex. Bots that fill in
+                 every field on a form will fill this too; humans never see
+                 it, so if it's non-empty on submit we quietly drop the
+                 submission as spam. -->
+            <input
+              type="text"
+              id="notifyCompany"
+              name="company"
+              autocomplete="off"
+              tabindex="-1"
+              aria-hidden="true"
+              class="hidden"
+            />
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center gap-2 bg-white text-rust font-semibold px-7 py-3.5 rounded-full hover:bg-cream transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-lg whitespace-nowrap"
+            >
+              Notify me
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </form>
+          <p id="notifyError" class="hidden text-white text-sm font-semibold mt-4">
+            Please enter a valid email address.
+          </p>
+          <p id="notifyThanks" class="hidden text-white text-sm font-semibold mt-5">
+            🐾 Thanks! We'll email you the moment we're live.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="border-t border-coat/10 bg-white/60 font-body">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-12 grid grid-cols-2 md:grid-cols-4 gap-10">
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="w-8 h-8 rounded-full bg-fur flex items-center justify-center p-1.5 shrink-0">
+            <img src="petkeeper-icon.png" alt="" class="w-full h-full object-contain" />
+          </span>
+          <span class="font-display font-bold text-coat">The Pet Keeper</span>
+        </div>
+        <p class="text-charcoal/60 text-sm leading-relaxed mb-4">
+          Booking, tracking and photographing your dog's day training to travel docs, all in one wellness timeline.
+        </p>
+        <div class="flex items-center gap-3">
+          <a href="#" aria-label="Instagram" class="w-8 h-8 rounded-full border border-coat/15 flex items-center justify-center text-coat/60 hover:text-rust hover:border-rust/40 transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
             </svg>
-            <div class="logo-text">The Pet Keeper</div>
+          </a>
+          <a href="#" aria-label="Facebook" class="w-8 h-8 rounded-full border border-coat/15 flex items-center justify-center text-coat/60 hover:text-rust hover:border-rust/40 transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+          <a href="https://wa.me/919570581298" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="w-8 h-8 rounded-full border border-coat/15 flex items-center justify-center text-coat/60 hover:text-rust hover:border-rust/40 transition">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12.004 2C6.478 2 2 6.477 2 12c0 1.867.51 3.617 1.397 5.117L2 22l5.032-1.36A9.96 9.96 0 0 0 12.004 22C17.53 22 22 17.523 22 12S17.53 2 12.004 2zm0 18.111a8.07 8.07 0 0 1-4.114-1.13l-.295-.176-3.06.827.82-2.988-.192-.306a8.09 8.09 0 0 1-1.24-4.338c0-4.478 3.646-8.121 8.086-8.121 4.44 0 8.086 3.643 8.086 8.121 0 4.478-3.646 8.111-8.086 8.111z"/>
+            </svg>
+          </a>
         </div>
+      </div>
 
-        <!-- Dynamic Live Countdown -->
-        <div class="bracket-box" id="countdownBox">
-            <span id="days-left">-- DAYS LEFT</span>
-        </div>
-    </header>
+      <div>
+        <h4 class="font-display font-bold text-sm text-coat mb-3">Services</h4>
+        <ul class="space-y-2 text-sm text-charcoal/60">
+          <li><a href="#services" class="hover:text-rust transition">Daily care</a></li>
+          <li><a href="#services" class="hover:text-rust transition">Health & training</a></li>
+          <li><a href="#services" class="hover:text-rust transition">Stay & celebrate</a></li>
+          <li><a href="#services" class="hover:text-rust transition">Travel & move</a></li>
+        </ul>
+      </div>
 
-    <!-- Slide-Down Utility Panels -->
-    <div class="slide-panel" id="aboutPanel">
-        <button class="close-btn" onclick="closePanel('aboutPanel')">&#10005;</button>
-        <div class="panel-content">
-            <h2>About the keeper</h2>
-            <p>The Pet Keeper is an upcoming platform offering specialized training methodologies, lifestyle curation, and expert behavior guides tailored for working breeds. We prioritize precision, focus, and modern positive training habits.</p>
-        </div>
+      <div>
+        <h4 class="font-display font-bold text-sm text-coat mb-3">Company</h4>
+        <ul class="space-y-2 text-sm text-charcoal/60">
+          <li><a href="#how-it-works" class="hover:text-rust transition">How it works</a></li>
+          <li><a href="#notify" class="hover:text-rust transition">Get notified</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-display font-bold text-sm text-coat mb-3">Contact</h4>
+        <ul class="space-y-2.5 text-sm text-charcoal/60">
+          <li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-fur shrink-0"></i> Patna, Bihar</li>
+          <li class="flex items-center gap-2"><i data-lucide="mail" class="w-3.5 h-3.5 text-fur shrink-0"></i> sunyk0092@gmail.com</li>
+          <li class="flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5 text-fur shrink-0"></i> +91 95705 81298</li>
+        </ul>
+      </div>
     </div>
 
-    <div class="slide-panel" id="contactPanel">
-        <button class="close-btn" onclick="closePanel('contactPanel')">&#10005;</button>
-        <div class="panel-content">
-            <h2>Get in touch</h2>
-            <p>Interested in early beta access, partnerships, or professional advice? Drop us an inquiry at:</p>
-            <p class="contact-email">hello@thepetkeeper.com</p>
-        </div>
+    <div class="border-t border-coat/10 bg-fur/8">
+      <div class="max-w-6xl mx-auto px-6 md:px-10 py-4 flex items-center justify-center gap-2">
+        <i data-lucide="paw-print" class="w-4 h-4 text-fur shrink-0"></i>
+        <span id="visitorCounterText" class="text-sm font-semibold text-coat tracking-wide">
+          Counting visitors…
+        </span>
+      </div>
     </div>
 
-    <!-- Center Hero Callout -->
-    <main>
-        <h1>Coming Soon</h1>
-        <p class="subtitle">We are currently training our new digital platform to fetch you the best experience. We will launch soon, subscribe to remain updated.</p>
+    <div class="border-t border-coat/10">
+      <div class="max-w-6xl mx-auto px-6 md:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-charcoal/50">
+        <span id="footerYear">© The Pet Keeper · Rohini Raushan Enterprises</span>
+        <span>Patna, Bihar</span>
+      </div>
+    </div>
+  </footer>
 
-        <!-- Interactive Morphing Signup Container -->
-        <div class="notify-container" id="notifyContainer">
-            <!-- <button class="notify-btn" id="notifyBtn" onclick="activateForm()">NOTIFY ME</button> -->
-            <form class="subscription-form" id="subscriptionForm">
-                <input type="email" placeholder="ENTER YOUR EMAIL" required id="emailInput">
-                <button type="submit">&#8594;</button>
-            </form>
-        </div>
-    </main>
+  <script>
+    lucide.createIcons();
 
-    <!-- Footer Area -->
-    <footer>
-        <div class="copyright">
-            Website by The Pet Keeper &copy; <span id="year"></span>. All Rights Reserved.
-        </div>
-        <div class="socials">
-            <a href="#">FB</a>
-            <a href="#">TW</a>
-            <a href="#">LN</a>
-            <a href="#">BE</a>
-        </div>
-    </footer>
+    // ---------- Header scroll shadow ----------
+    const header = document.getElementById("siteHeader");
+    function onScrollHeader() {
+      if (window.scrollY > 8) {
+        header.classList.add("shadow-[0_1px_16px_rgba(0,0,0,0.06)]", "border-coat/10");
+      } else {
+        header.classList.remove("shadow-[0_1px_16px_rgba(0,0,0,0.06)]", "border-coat/10");
+      }
+    }
+    onScrollHeader();
+    window.addEventListener("scroll", onScrollHeader, { passive: true });
 
-    <script>
-        // 1. Dynamic Countdown Timer (Calculates days dynamically)
-        // Adjust the date below to set your exact target date
-        const targetLaunchDate = new Date();
-        targetLaunchDate.setDate(targetLaunchDate.getDate() + 36); // 35 Days from today
+    // ---------- Mobile menu ----------
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileNav = document.getElementById("mobileNav");
+    const menuIconOpen = document.getElementById("menuIconOpen");
+    const menuIconClose = document.getElementById("menuIconClose");
+    menuToggle.addEventListener("click", () => {
+      const isOpen = mobileNav.classList.toggle("open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuIconOpen.classList.toggle("hidden", isOpen);
+      menuIconClose.classList.toggle("hidden", !isOpen);
+    });
+    mobileNav.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        mobileNav.classList.remove("open");
+        menuIconOpen.classList.remove("hidden");
+        menuIconClose.classList.add("hidden");
+        menuToggle.setAttribute("aria-expanded", "false");
+      })
+    );
 
-        function calculateCountdown() {
-            const now = new Date();
-            const difference = targetLaunchDate - now;
-            const daysRemaining = Math.max(0, Math.ceil(difference / (1000 * 60 * 60 * 24)));
-            document.getElementById('days-left').textContent = `${daysRemaining} DAYS LEFT`;
-        }
-        calculateCountdown();
-
-        // 2. Dynamic Copyright Year
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // 3. Morphing Form Activation
-        function activateForm() {
-            document.getElementById('notifyContainer').classList.add('active');
-            setTimeout(() => {
-                document.getElementById('emailInput').focus();
-            }, 300);
-        }
-
-        // Close form on clicking outside the container
-        document.addEventListener('click', function(event) {
-            const container = document.getElementById('notifyContainer');
-            const button = document.getElementById('notifyBtn');
-            if (!container.contains(event.target) && event.target !== button) {
-                container.classList.remove('active');
-            }
+    // ---------- Scroll reveal ----------
+    const revealEls = document.querySelectorAll(".reveal");
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("reveal-visible");
+            revealObserver.unobserve(entry.target);
+          }
         });
+      },
+      { threshold: 0.15 }
+    );
+    revealEls.forEach((el) => revealObserver.observe(el));
 
-        // Form submission feedback
-        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('emailInput').value;
-            if(email) {
-                alert(`Thank you! ${email} has been added to our launching alert list.`);
-                document.getElementById('notifyContainer').classList.remove('active');
-                document.getElementById('emailInput').value = '';
-            }
+    // ---------- Testimonials ----------
+    const TESTIMONIALS = [
+      { id: 1, name: "Ritika Sinha", locality: "Boring Road, Patna", dogName: "Bruno", rating: 5,
+        quote: "I travel for work every other week and the live updates are what sold me. I know exactly when Bruno's been walked and fed, not a guess." },
+      { id: 2, name: "Abhinav Kumar", locality: "Kankarbagh, Patna", dogName: "Coco", rating: 5,
+        quote: "Coco is nervous around strangers, so the trainer profile and photo updates before the first visit made a real difference. She settled in fast." },
+      { id: 3, name: "Sneha Prasad", locality: "Rajendra Nagar, Patna", dogName: "Simba", rating: 4,
+        quote: "Booking used to mean five phone calls to five different people. Now it's training, grooming and vaccination reminders in one app." },
+      { id: 4, name: "Manish Verma", locality: "Patliputra Colony, Patna", dogName: "Leo", rating: 5,
+        quote: "The relocation paperwork help alone was worth it — they sorted Leo's travel docs for our move faster than I expected." },
+    ];
+    const AVATAR_GRADIENTS = ["from-fur to-rust", "from-coat to-fur", "from-rust to-coat", "from-fur to-coat"];
+    function initials(name) {
+      return name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+    }
+
+    let active = 0;
+    let paused = false;
+
+    const card = document.getElementById("testimonialCard");
+    const starsEl = document.getElementById("testimonialStars");
+    const quoteEl = document.getElementById("testimonialQuote");
+    const avatarEl = document.getElementById("testimonialAvatar");
+    const nameEl = document.getElementById("testimonialName");
+    const localityEl = document.getElementById("testimonialLocality");
+    const railEl = document.getElementById("testimonialRail");
+
+    function renderTestimonial() {
+      const t = TESTIMONIALS[active];
+      card.classList.remove("testimonial-fade");
+      void card.offsetWidth; // restart animation
+      card.classList.add("testimonial-fade");
+
+      starsEl.innerHTML = "";
+      for (let i = 0; i < 5; i++) {
+        const star = document.createElement("i");
+        star.setAttribute("data-lucide", "star");
+        star.className = i < t.rating
+          ? "w-4 h-4 text-rust fill-current"
+          : "w-4 h-4 text-coat/15 fill-current";
+        starsEl.appendChild(star);
+      }
+
+      quoteEl.textContent = `"${t.quote}"`;
+      avatarEl.className = `w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[active % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-display font-bold text-sm`;
+      avatarEl.textContent = initials(t.name);
+      nameEl.textContent = t.name;
+      localityEl.textContent = `${t.locality} · with ${t.dogName}`;
+
+      lucide.createIcons();
+    }
+
+    function renderRail() {
+      railEl.innerHTML = "";
+      TESTIMONIALS.forEach((t, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.setAttribute("aria-label", `Show testimonial from ${t.name}`);
+        btn.className = `w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-[11px] text-white bg-gradient-to-br ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} transition-all duration-300 ${
+          i === active ? "ring-2 ring-offset-2 ring-fur scale-110" : "opacity-50 hover:opacity-90"
+        }`;
+        btn.textContent = initials(t.name);
+        btn.addEventListener("click", () => {
+          active = i;
+          renderTestimonial();
+          renderRail();
         });
+        railEl.appendChild(btn);
+      });
+    }
 
-        // 4. Panel Slider Controls
-        function openPanel(panelId) {
-            // Close any open panels first
-            document.querySelectorAll('.slide-panel').forEach(panel => {
-                panel.classList.remove('open');
-            });
-            document.getElementById(panelId).classList.add('open');
+    renderTestimonial();
+    renderRail();
+
+    setInterval(() => {
+      if (paused) return;
+      active = (active + 1) % TESTIMONIALS.length;
+      renderTestimonial();
+      renderRail();
+    }, 5000);
+
+    const testimonialsSection = document.getElementById("testimonials");
+    testimonialsSection.addEventListener("mouseenter", () => (paused = true));
+    testimonialsSection.addEventListener("mouseleave", () => (paused = false));
+
+    // =====================================================================
+    // SHARED DATA BACKEND — one small Google Apps Script Web App
+    // =====================================================================
+    // Powers BOTH the visitor counter and the "notify me" email list, so
+    // both are real, shared, and retrievable — not per-browser guesses.
+    //
+    // ONE-TIME SETUP (about 5 minutes):
+    //   1. Create a new Google Sheet.
+    //   2. Extensions → Apps Script, delete the sample code, paste the
+    //      script from APPS_SCRIPT_CODE.gs (ask Claude for it if you don't
+    //      have it — it's the companion file to this page).
+    //   3. Deploy → New deployment → type "Web app" →
+    //      Execute as: Me · Who has access: Anyone.
+    //   4. Copy the deployment URL it gives you and paste it below as
+    //      BACKEND_URL. Save this file.
+    // After that, "Visitors" and "Leads" tabs in that Sheet fill in live,
+    // and every visitor sees the same real counter. It's safe to leave
+    // that URL in this public file — it can only run the specific actions
+    // written in the script (log a visit, add a lead), it doesn't expose
+    // any secret key or give anyone read/delete access to your Sheet.
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzf7w5mDp_eBhpXSybsO96ZaISZky-nWYlm_d-_ZTIUkpbRhaeZq_ent9FhVeyUJRVJ/exec"; // <-- paste your Apps Script Web App URL here
+
+    // ipapi.co gives us IP + rough city/country in one call, so we don't
+    // need a separate geolocation lookup.
+    const VISITOR_INFO_API = "https://ipapi.co/json/";
+    const VISITOR_BASE_COUNT = 2250;
+    const VISITOR_INCREMENT = 9;
+    const LOCAL_FALLBACK_KEY = "petkeeper_visitor_log_fallback";
+
+    let cachedInfo = null;
+    async function getVisitorInfo() {
+      if (cachedInfo) return cachedInfo;
+      try {
+        const res = await fetch(VISITOR_INFO_API);
+        const data = await res.json();
+        cachedInfo = {
+          ip: data.ip || null,
+          city: data.city || "",
+          country: data.country_name || "",
+        };
+      } catch (e) {
+        cachedInfo = { ip: null, city: "", country: "" };
+      }
+      return cachedInfo;
+    }
+
+    // Kept for backwards compatibility with any code below that just
+    // wants the IP address on its own.
+    async function getVisitorIp() {
+      const info = await getVisitorInfo();
+      return info.ip;
+    }
+
+    // Browser/device + referrer info — all read straight from the
+    // browser, no extra network call needed.
+    function getDeviceInfo() {
+      return {
+        userAgent: navigator.userAgent || "",
+        screenSize: (screen && screen.width && screen.height)
+          ? `${screen.width}x${screen.height}`
+          : "",
+        referrer: document.referrer || "Direct",
+      };
+    }
+
+    // ---------- Local-only fallback, used only until BACKEND_URL is set ----------
+    function loadLocalFallback() {
+      try {
+        const raw = localStorage.getItem(LOCAL_FALLBACK_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { counter: VISITOR_BASE_COUNT, seenIps: {} };
+    }
+    function saveLocalFallback(store) {
+      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(store)); } catch (e) {}
+    }
+    async function localFallbackVisit() {
+      const store = loadLocalFallback();
+      const ip = (await getVisitorIp()) || "unknown-browser";
+      if (!store.seenIps[ip]) {
+        store.counter += VISITOR_INCREMENT;
+        store.seenIps[ip] = true;
+        saveLocalFallback(store);
+      }
+      return store.counter;
+    }
+
+    // ---------- Visitor counter ----------
+    async function updateVisitorCounter() {
+      const el = document.getElementById("visitorCounterText");
+      let counter;
+
+      if (BACKEND_URL) {
+        try {
+          const info = await getVisitorInfo();
+          const device = getDeviceInfo();
+          const res = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" }, // avoids a CORS preflight on Apps Script
+            body: JSON.stringify({
+              type: "visit",
+              ip: info.ip,
+              city: info.city,
+              country: info.country,
+              ...device,
+            }),
+          });
+          const data = await res.json();
+          counter = data.counter;
+        } catch (e) {
+          counter = await localFallbackVisit();
         }
+      } else {
+        counter = await localFallbackVisit();
+      }
 
-        function closePanel(panelId) {
-            document.getElementById(panelId).classList.remove('open');
+      if (el) {
+        el.textContent = `You're visitor No. ${Number(counter).toLocaleString("en-IN")}`;
+      }
+    }
+    updateVisitorCounter();
+
+    // ---------- Notify form: validated, spam-trapped, IP-tagged lead capture ----------
+    const notifyForm = document.getElementById("notifyForm");
+    const notifyEmail = document.getElementById("notifyEmail");
+    const notifyCompany = document.getElementById("notifyCompany"); // honeypot
+    const notifyThanks = document.getElementById("notifyThanks");
+    const notifyError = document.getElementById("notifyError");
+
+    // Reasonably strict but real-world-friendly email check: something@something.tld
+    const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+
+    function showNotifyError(message) {
+      notifyError.textContent = message;
+      notifyError.classList.remove("hidden");
+      notifyThanks.classList.add("hidden");
+    }
+
+    notifyForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      notifyError.classList.add("hidden");
+
+      const email = notifyEmail.value.trim();
+
+      // Silently drop bot submissions: a real visitor never fills the
+      // honeypot field in, since it's hidden from them.
+      if (notifyCompany.value.trim() !== "") {
+        notifyForm.reset();
+        return;
+      }
+
+      if (!email || !EMAIL_PATTERN.test(email)) {
+        showNotifyError("Please enter a valid email address.");
+        return;
+      }
+
+      const submitBtn = notifyForm.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
+
+      try {
+        const info = await getVisitorInfo();
+        const device = getDeviceInfo();
+        if (BACKEND_URL) {
+          await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+              type: "lead",
+              email,
+              ip: info.ip,
+              city: info.city,
+              country: info.country,
+              ...device,
+            }),
+          });
+        } else {
+          // Same local-only fallback pattern as the counter, until
+          // BACKEND_URL is configured.
+          const key = "petkeeper_leads_fallback";
+          let leads = [];
+          try { leads = JSON.parse(localStorage.getItem(key)) || []; } catch (e2) {}
+          leads.push({ email, ip, at: new Date().toISOString() });
+          try { localStorage.setItem(key, JSON.stringify(leads)); } catch (e2) {}
         }
+        notifyForm.classList.add("hidden");
+        notifyThanks.classList.remove("hidden");
+      } catch (e) {
+        showNotifyError("Something went wrong — please try again in a moment.");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
 
-        // Subtle parallax effect on load
-        window.addEventListener('load', () => {
-            document.getElementById('bgImage').style.transform = 'scale(1.03)';
-        });
-    </script>
+    // ---------- Footer year ----------
+    document.getElementById("footerYear").textContent =
+      `© ${new Date().getFullYear()} The Pet Keeper · Rohini Raushan Enterprises`;
+
+    // ---------- Paw trail (decorative, xl screens only) ----------
+    const PAW_SPACING = 132;
+    const PAW_START_OFFSET = 640;
+    const PAW_X = [0, 28];
+    const pawTrail = document.getElementById("pawTrail");
+    let pawEls = [];
+
+    function buildPawTrail() {
+      // Measured off the last real content section's own layout position
+      // (not document.documentElement.scrollHeight) on purpose: the trail
+      // itself is an absolutely-positioned child of <main>, so measuring
+      // against the whole document would include the trail's own prior
+      // height in the next calculation and the page would keep growing
+      // taller every time this function ran (on load, on resize, ...).
+      const lastSection = document.getElementById("notify");
+      const contentHeight = lastSection.offsetTop + lastSection.offsetHeight;
+      pawTrail.style.height = contentHeight + "px";
+      const count = Math.max(0, Math.floor((contentHeight - PAW_START_OFFSET - 300) / PAW_SPACING));
+      pawTrail.innerHTML = "";
+      pawEls = [];
+      for (let i = 0; i < count; i++) {
+        const isLeft = i % 2 === 0;
+        const y = PAW_START_OFFSET + i * PAW_SPACING;
+        const x = isLeft ? PAW_X[0] : PAW_X[1];
+        const rotation = isLeft ? -18 : 18;
+        const span = document.createElement("span");
+        span.className = "paw";
+        span.style.top = y + "px";
+        span.style.left = x + "px";
+        span.style.transform = `rotate(${rotation}deg) scale(0.7)`;
+        span.innerHTML = '<i data-lucide="paw-print" style="width:20px;height:20px"></i>';
+        span.dataset.y = y;
+        pawTrail.appendChild(span);
+        pawEls.push(span);
+      }
+      lucide.createIcons();
+      updatePawTrail();
+    }
+
+    function updatePawTrail() {
+      const walkedTo = window.scrollY + window.innerHeight * 0.45;
+      pawEls.forEach((el) => {
+        const y = Number(el.dataset.y);
+        const distance = walkedTo - y;
+        el.classList.remove("walked", "landing");
+        const rotation = el.style.transform.match(/rotate\(([-\d]+)deg\)/)[1];
+        if (distance > 90) {
+          el.classList.add("walked");
+          el.style.transform = `rotate(${rotation}deg) scale(1)`;
+        } else if (distance > -50) {
+          el.classList.add("landing");
+          el.style.transform = `rotate(${rotation}deg) scale(1.3)`;
+        } else {
+          el.style.transform = `rotate(${rotation}deg) scale(0.7)`;
+        }
+      });
+    }
+
+    let pawTicking = false;
+    window.addEventListener("scroll", () => {
+      if (pawTicking) return;
+      pawTicking = true;
+      requestAnimationFrame(() => {
+        updatePawTrail();
+        pawTicking = false;
+      });
+    }, { passive: true });
+
+    window.addEventListener("resize", buildPawTrail);
+    window.addEventListener("load", buildPawTrail);
+  </script>
 </body>
 </html>
